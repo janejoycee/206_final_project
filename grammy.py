@@ -18,7 +18,16 @@ def retrieve_listings():
 
         soup = BeautifulSoup(file, 'html.parser')
 
-        cateogry_ = []
+        genre_dic = {}
+        award_dic = {}
+        nominee_dic = {}
+        winner_dic = {}
+
+        genres = soup.find_all('h3', class_='edTag')
+        strong_tags = soup.find_all('strong', class_='edTag')
+
+        print(strong_tags)
+
         # listing_pattern = r'\/(\d+)'
         # new_list = []
         # id_list = []
@@ -70,23 +79,8 @@ def retrieve_listings():
 
 
 
-class TestCases(unittest.TestCase):
-    def setUp(self):
-        self.listings = retrieve_listings("html_files/search_results.html")
-
-    def test_retrieve_listings(self):
-        # call retrieve_listings("html_files/search_results.html")
-        # and save to a local variable
-        listings = retrieve_listings("html_files/search_results.html")
-
-
 def main (): 
-    detailed_data = make_listing_database("html_files/search_results.html")
-    # listing_details('467507')
-    # write_csv(detailed_data, "airbnb_dataset.csv")
-    # retrieve_listings("html_files/search_results.html")
-    # make_listing_database("html_files/search_results.html")
-    # goodreads_searcher('airbnb')
+    retrieve_listings()
     
 
 
