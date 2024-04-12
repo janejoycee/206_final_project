@@ -39,8 +39,6 @@ def get_rank_artist_data(date):
             else:
                 print("Billboard Top Artist Chart Not Found")
 
-
-    print(top_100_artist_dict)
     return top_100_artist_dict
 
 
