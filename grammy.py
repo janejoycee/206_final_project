@@ -27,9 +27,12 @@ def retrieve_listings():
     nominee_list = []
     winner_dic = {}
     title_regex = r'\d+\.\s*(.+)'
-    winner_regex = r'^"WINNER:"\s*(.+)'
 
     genres = soup.find_all('h3', class_='edTag')
+    for genre in genres:
+        genre = genre.text
+        print(genre)
+        #should be 27
     #print(genres)
 
     strong_tags_inside_p = soup.find_all('p')  # Find all <p> tags
@@ -51,8 +54,7 @@ def retrieve_listings():
     for item in song_and_artist_noms:
         text = item.text
         #print(text)
-        
-        
+
         if "WINNER:" in text:
             winner_start_index = text.find("WINNER:") + len("WINNER:")
             winner_text = text[winner_start_index:].strip()
