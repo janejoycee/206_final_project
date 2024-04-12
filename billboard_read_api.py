@@ -44,6 +44,12 @@ def get_rank_artist_data(date):
     return top_100_artist_dict
 
 
+def get_artist_list(date):
+    artist_dict = get_rank_artist_data(date)
+    artist_list = list(artist_dict.keys())
+    return artist_list
+
+
 
     
 def main():
