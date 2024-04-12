@@ -3,7 +3,6 @@ import requests
 import json
 import unittest
 import os
-from datetime import datetime, timedelta
 
 
 def get_rank_artist_data(date):
@@ -53,8 +52,6 @@ def main():
     '''
     billboard_artist_json = get_rank_artist_data('2019-05-01')
     print(billboard_artist_json)
-
-
 
 
 if __name__ == "__main__":
