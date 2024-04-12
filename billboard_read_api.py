@@ -56,7 +56,7 @@ def main():
     '''
     Call functions here.
     '''
-    billboard_artist_json = get_rank_artist_data('2019-05-01')
+    billboard_artist_json = get_rank_artist_data('2023-05-01')
     print(billboard_artist_json)
 
 
