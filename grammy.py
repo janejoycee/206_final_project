@@ -9,25 +9,44 @@ import unittest
 
 def retrieve_listings(): 
 
-    relative_path = f"https://www.npr.org/2023/02/02/1153442645/2023-grammy-awards-nominees-winners"
+    relative_path = "/2023/02/02/1153442645/2023-grammy-awards-nominees-winners"
 
-    base_path = os.path.abspath(os.path.dirname(__file__))
-    full_path = os.path.join(base_path, relative_path)
+    base_url = "https://www.npr.org"
+    full_url = base_url + relative_path
 
-    with  open(full_path, "r", encoding="utf-8-sig") as file:
+    # Fetch HTML content from the URL
+    response = requests.get(full_url)
+    html_content = response.text
 
-        soup = BeautifulSoup(file, 'html.parser')
+    # Parse the HTML content using BeautifulSoup
+    soup = BeautifulSoup(html_content, 'html.parser')
 
-        genre_dic = {}
-        award_dic = {}
-        nominee_dic = {}
-        winner_dic = {}
 
-        genres = soup.find_all('h3', class_='edTag')
-        strong_tags = soup.find_all('strong', class_='edTag')
+    genre_dic = {}
+    award_dic = {}
+    nominee_dic = {}
+    winner_dic = {}
+    title_regex = r'\d+\.\s*(.+)'
 
-        print(strong_tags)
+    genres = soup.find_all('h3', class_='edTag')
+    #print(genres)
 
+    strong_tags_inside_p = soup.find_all('p')  # Find all <p> tags
+    for p_tag in strong_tags_inside_p:
+        strong_tags = p_tag.find_all('strong')  # Find all <strong> tags inside each <p> tag
+        for strong_tag in strong_tags:
+            strong_text = strong_tag.get_text()
+            match = re.match(title_regex, strong_text)
+            if match:
+                title = match.group(1)
+                #print(title)
+
+    song_and_artist_noms = soup.find_all('li', class_='edTag')
+    #print(song_and_artist_noms)
+
+    for item in song_and_artist_noms:
+        text = item.text
+        print(text)
         # listing_pattern = r'\/(\d+)'
         # new_list = []
         # id_list = []
