@@ -22,7 +22,7 @@ def retrieve_listings():
     soup = BeautifulSoup(html_content, 'html.parser')
 
 
-    genre_dic = {}
+    genre_list = []
     award_dic = {}
     nominee_list = []
     winner_dic = {}
@@ -31,9 +31,12 @@ def retrieve_listings():
     genres = soup.find_all('h3', class_='edTag')
     for genre in genres:
         genre = genre.text
-        print(genre)
+        #print(genre)
+        genre_list.append(genre)
         #should be 27
-    #print(genres)
+    
+    print(genre_list)
+    #print(len(genre_dic))
 
     strong_tags_inside_p = soup.find_all('p')  # Find all <p> tags
     for p_tag in strong_tags_inside_p:
@@ -44,6 +47,10 @@ def retrieve_listings():
             if match:
                 title = match.group(1)
                 #print(title)
+                if title not in award_dic:
+                    award_dic[title] = {}
+    
+    #print(award_dic)
 
     edTag_ul = soup.find('ul', class_='edTag')
 
@@ -52,14 +59,21 @@ def retrieve_listings():
     winner_text = ""
 
     for item in song_and_artist_noms:
+        #print(item)
+        if "WINNER:" in item:
+            continue  # Skip to the next item if "WINNER:" is found
         text = item.text
-        #print(text)
+        print(text)
 
         if "WINNER:" in text:
             winner_start_index = text.find("WINNER:") + len("WINNER:")
             winner_text = text[winner_start_index:].strip()
+            winner_but_no_label = text.replace("WINNER: ", "")
+            print(winner_but_no_label)
 
     print("Winner text:", winner_text)
+
+
 
             
 
