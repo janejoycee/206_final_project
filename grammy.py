@@ -35,8 +35,8 @@ def retrieve_listings():
         genre_list.append(genre)
         #should be 27
     
-    print(genre_list)
-    #print(len(genre_dic))
+   # print(genre_list)
+    #print(len(genre_list))
 
     strong_tags_inside_p = soup.find_all('p')  # Find all <p> tags
     for p_tag in strong_tags_inside_p:
@@ -48,30 +48,35 @@ def retrieve_listings():
                 title = match.group(1)
                 #print(title)
                 if title not in award_dic:
-                    award_dic[title] = {}
+                    award_dic[title] = []
     
-    #print(award_dic)
+    print(award_dic)
 
-    edTag_ul = soup.find('ul', class_='edTag')
+    edTag_ul = soup.find_all('ul', class_='edTag')
 
-    song_and_artist_noms = edTag_ul.find_all('li')
+    for edTag in edTag_ul: #for every award in a list of awards
+        #print(edTag)
 
-    winner_text = ""
+        song_and_artist_noms = edTag.find_all('li') #get every awards nominations
 
-    for item in song_and_artist_noms:
-        #print(item)
-        if "WINNER:" in item:
-            continue  # Skip to the next item if "WINNER:" is found
-        text = item.text
-        print(text)
+        winner_text = ""
 
-        if "WINNER:" in text:
-            winner_start_index = text.find("WINNER:") + len("WINNER:")
-            winner_text = text[winner_start_index:].strip()
-            winner_but_no_label = text.replace("WINNER: ", "")
-            print(winner_but_no_label)
+        for item in song_and_artist_noms:
+            #print(item)
+            if "WINNER:" in item:
+                continue  # Skip to the next item if "WINNER:" is found
+            text = item.text
+            print(text)
+        
+            if "WINNER:" in text:
+                winner_start_index = text.find("WINNER:") + len("WINNER:")
+                winner_text = text[winner_start_index:].strip()
+                winner_but_no_label = text.replace("WINNER: ", "")
+                #print(winner_but_no_label)
 
-    print("Winner text:", winner_text)
+        print("Winner text:", winner_text)
+
+
 
 
 
