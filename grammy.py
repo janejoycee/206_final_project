@@ -25,7 +25,7 @@ def retrieve_listings():
     soup = BeautifulSoup(html_content, 'html.parser')
 
     award_dic = {}
-    nominee_list = []
+    pattern = r'^(.*?)\s*—\s*(.*?)$'
 
     categories =  soup.find_all('p', class_='clay-paragraph')
 
@@ -36,16 +36,41 @@ def retrieve_listings():
         else:
             continue
         
-        nominee_strings = category.get_text(separator="\n").split('\n')
-        
-        nominee_strings = [nominee for nominee in nominee_strings if nominee and nominee != award_name]
-        
-        if nominee_strings:
-            award_dic[award_name] = nominee_strings
-    print(award_dic)
+
+        for category in categories:
+            award_name_element = category.find('strong')
+            if award_name_element:
+                award_name = award_name_element.text.strip()
+            if not award_name_element:
+                continue
+
+            award_name = award_name_element.text.strip()
+            award_name_element.extract()
+
+            nominee_lines = category.get_text(separator="\n").split('\n')
+
+            nominee_tuples = []
+
+            pattern = re.compile(r'“(.*?)”\s*—\s*(.*)')
+
+            for line in nominee_lines:
+
+                for match in pattern.finditer(line):
+
+                    song, artist = match.groups()
+
+                    nominee_tuples.append((song.strip(), artist.strip()))
+
+            if nominee_tuples:
+                award_dic[award_name] = nominee_tuples
+
+
+        print(award_dic)
+        print(len(award_dic))
     
     return award_dic
 
+    #need to a account for Album of the Year
 
 
 
