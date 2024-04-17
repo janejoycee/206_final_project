@@ -28,6 +28,7 @@ def retrieve_listings():
     pattern = r'^(.*?)\s*—\s*(.*?)$'
 
     categories =  soup.find_all('p', class_='clay-paragraph')
+    
 
     for category in categories:  
         award_name_element = category.find('strong')
@@ -36,37 +37,33 @@ def retrieve_listings():
         else:
             continue
         
+    
+        award_name = award_name_element.text.strip()
+        award_name_element.extract()
 
-        for category in categories:
-            award_name_element = category.find('strong')
-            if award_name_element:
-                award_name = award_name_element.text.strip()
-            if not award_name_element:
-                continue
+        nominee_lines = list(category.stripped_strings)
+        print((nominee_lines))
 
-            award_name = award_name_element.text.strip()
-            award_name_element.extract()
+        #i and i-1 if i starts with a /
+        
 
-            nominee_lines = category.get_text(separator="\n").split('\n')
+        #pattern = re.compile(r'“(.*?)”\s*—\s*(.*)')
 
-            nominee_tuples = []
+        for line in nominee_lines:
+             award_dic[award_name] = line
 
-            pattern = re.compile(r'“(.*?)”\s*—\s*(.*)')
+            # for match in pattern.finditer(line):
 
-            for line in nominee_lines:
+            #     song, artist = match.groups()
 
-                for match in pattern.finditer(line):
+            #     nominee_tuples.append((song.strip(), artist.strip()))
 
-                    song, artist = match.groups()
-
-                    nominee_tuples.append((song.strip(), artist.strip()))
-
-            if nominee_tuples:
-                award_dic[award_name] = nominee_tuples
+       # if nominee_tuples:
+            #award_dic[award_name] = nominee_tuples
 
 
-        print(award_dic)
-        print(len(award_dic))
+    print(award_dic)
+    print(len(award_dic))
     
     return award_dic
 
