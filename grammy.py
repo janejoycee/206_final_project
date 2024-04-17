@@ -31,19 +31,15 @@ def retrieve_listings():
 
     for category in categories:  
         award_name_element = category.find('strong')
-        if award_name_element:  # Ensure that the strong tag exists
+        if award_name_element: 
             award_name = award_name_element.text.strip()
         else:
-            # If there isn't an award name, skip this category
             continue
         
-        # Split category contents by <br> tag to get individual nominees
         nominee_strings = category.get_text(separator="\n").split('\n')
         
-        # Remove any empty strings that may exist after the split
         nominee_strings = [nominee for nominee in nominee_strings if nominee and nominee != award_name]
         
-        # Ensure we have some nominees, if not, skip to next category
         if nominee_strings:
             award_dic[award_name] = nominee_strings
     print(award_dic)
