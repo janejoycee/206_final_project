@@ -9,72 +9,115 @@ import unittest
 
 def retrieve_listings(): 
 
-    relative_path = "/2023/02/02/1153442645/2023-grammy-awards-nominees-winners"
+    relative_path = "/2023/02/grammys-2023-full-list-of-winners.html"
 
-    base_url = "https://www.npr.org"
+    base_url = "https://www.vulture.com/"
     full_url = base_url + relative_path
 
-    # Fetch HTML content from the URL
+    
     response = requests.get(full_url)
+    if response.status_code != 200:  # Checks if the request was successful
+        print('Failed to retrieve content.')
+        return None
     html_content = response.text
 
     # Parse the HTML content using BeautifulSoup
     soup = BeautifulSoup(html_content, 'html.parser')
 
-
-    genre_list = []
     award_dic = {}
     nominee_list = []
-    winner_dic = {}
-    title_regex = r'\d+\.\s*(.+)'
 
-    genres = soup.find_all('h3', class_='edTag')
-    for genre in genres:
-        genre = genre.text
-        #print(genre)
-        genre_list.append(genre)
-        #should be 27
-    
-   # print(genre_list)
-    #print(len(genre_list))
+    categories =  soup.find_all('p', class_='clay-paragraph')
 
-    strong_tags_inside_p = soup.find_all('p')  # Find all <p> tags
-    for p_tag in strong_tags_inside_p:
-        strong_tags = p_tag.find_all('strong')  # Find all <strong> tags inside each <p> tag
-        for strong_tag in strong_tags:
-            strong_text = strong_tag.get_text()
-            match = re.match(title_regex, strong_text)
-            if match:
-                title = match.group(1)
-                #print(title)
-                if title not in award_dic:
-                    award_dic[title] = []
-    
-    print(award_dic)
-
-    edTag_ul = soup.find_all('ul', class_='edTag')
-
-    for edTag in edTag_ul: #for every award in a list of awards
-        #print(edTag)
-
-        song_and_artist_noms = edTag.find_all('li') #get every awards nominations
-
-        winner_text = ""
-
-        for item in song_and_artist_noms:
-            #print(item)
-            if "WINNER:" in item:
-                continue  # Skip to the next item if "WINNER:" is found
-            text = item.text
-            print(text)
+    for category in categories:  
+        award_name_element = category.find('strong')
+        if award_name_element:  # Ensure that the strong tag exists
+            award_name = award_name_element.text.strip()
+        else:
+            # If there isn't an award name, skip this category
+            continue
         
-            if "WINNER:" in text:
-                winner_start_index = text.find("WINNER:") + len("WINNER:")
-                winner_text = text[winner_start_index:].strip()
-                winner_but_no_label = text.replace("WINNER: ", "")
-                #print(winner_but_no_label)
+        # Split category contents by <br> tag to get individual nominees
+        nominee_strings = category.get_text(separator="\n").split('\n')
+        
+        # Remove any empty strings that may exist after the split
+        nominee_strings = [nominee for nominee in nominee_strings if nominee and nominee != award_name]
+        
+        # Ensure we have some nominees, if not, skip to next category
+        if nominee_strings:
+            award_dic[award_name] = nominee_strings
+    print(award_dic)
+    
+    return award_dic
 
-        print("Winner text:", winner_text)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#     genres = soup.find_all('h3', class_='edTag')
+#     for genre in genres:
+#         genre = genre.text
+#         #print(genre)
+#         genre_list.append(genre)
+#         #should be 27
+    
+#    # print(genre_list)
+#     #print(len(genre_list))
+
+#     strong_tags_inside_p = soup.find_all('p')  # Find all <p> tags
+#     for p_tag in strong_tags_inside_p:
+#         strong_tags = p_tag.find_all('strong')  # Find all <strong> tags inside each <p> tag
+#         for strong_tag in strong_tags:
+#             strong_text = strong_tag.get_text()
+#             match = re.match(title_regex, strong_text)
+#             if match:
+#                 title = match.group(1)
+#                 #print(title)
+#                 if title not in award_dic:
+#                     award_dic[title] = []
+    
+#     print(award_dic)
+
+#     edTag_ul = soup.find_all('ul', class_='edTag')
+
+#     for edTag in edTag_ul: #for every award in a list of awards
+#         #print(edTag)
+
+#         song_and_artist_noms = edTag.find_all('li') #get every awards nominations
+
+#         winner_text = ""
+
+#         for item in song_and_artist_noms:
+#             #print(item)
+#             if "WINNER:" in item:
+#                 continue  # Skip to the next item if "WINNER:" is found
+#             text = item.text
+#             print(text)
+        
+#             if "WINNER:" in text:
+#                 winner_start_index = text.find("WINNER:") + len("WINNER:")
+#                 winner_text = text[winner_start_index:].strip()
+#                 winner_but_no_label = text.replace("WINNER: ", "")
+#                 #print(winner_but_no_label)
+
+#         print("Winner text:", winner_text)
+        
+        # to seperate the artist by the song, do whatever is in quotes
+        # is there something that seperates it by italics
 
 
 
