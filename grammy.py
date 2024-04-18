@@ -83,22 +83,21 @@ def get_winners ():
     winner_dict = {}
 
     categories =  soup.find_all('p', class_='clay-paragraph')
-    
-    for category in categories:
-        award_name_element = category.find_all('strong')[0]
-        print(award_name_element)
-        if award_name_element:
-            award_name = award_name_element.text.strip()
-            #award_name_element.extract()
+
+    for award_list in categories:
+        strong_elements = award_list.find_all('strong')
+        #print(strong_elements)
+
+        if len(strong_elements) >= 2:
+            award_name = strong_elements[0].get_text(strip=True)
+            winner = strong_elements[1].get_text(strip=True)
+            #print(f"The winner for {award_name} is {winner}")
+            winner_dict[award_name] = winner
         else:
-            continue
+            print("Not enough <strong> elements within this category to determine the award and the winner.")
 
-        award_winner = category.find_all('strong')[1]
-        print(award_winner)
-
-        winner_dict[award_name] = award_winner
-
-        print(winner_dict)
+    print(winner_dict)
+    print(len(winner_dict))
     return winner_dict
     
 
@@ -112,6 +111,7 @@ def get_winners ():
 
 def main (): 
     retrieve_listings()
+    get_winners()
     
 
 
