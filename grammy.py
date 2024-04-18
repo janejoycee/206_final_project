@@ -57,7 +57,7 @@ def retrieve_listings():
         #print(combined_list)
         award_dic[award_name] = combined_list
 
-    #print(award_dic)
+    print(award_dic)
    # print(len(award_dic))
     
     return award_dic
@@ -96,22 +96,20 @@ def get_winners ():
         else:
             print("Not enough <strong> elements within this category to determine the award and the winner.")
 
-    print(winner_dict)
-    print(len(winner_dict))
+    #print(winner_dict)
+    #print(len(winner_dict))
     return winner_dict
-    
 
-    #this function gets the winners for every category, and adds it to a list
-
-        
     
     pass
 
+# def get_info_about_artist (artist):
 
 
 def main (): 
     retrieve_listings()
     get_winners()
+
     
 
 
