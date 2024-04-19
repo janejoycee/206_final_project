@@ -57,7 +57,7 @@ def retrieve_listings():
         #print(combined_list)
         award_dic[award_name] = combined_list
 
-    print(award_dic)
+    #print(award_dic)
    # print(len(award_dic))
     
     return award_dic
@@ -93,8 +93,8 @@ def get_winners ():
             winner = strong_elements[1].get_text(strip=True)
             #print(f"The winner for {award_name} is {winner}")
             winner_dict[award_name] = winner
-        else:
-            print("Not enough <strong> elements within this category to determine the award and the winner.")
+        #else:
+            #print("Not enough <strong> elements within this category to determine the award and the winner.")
 
     #print(winner_dict)
     #print(len(winner_dict))
@@ -103,12 +103,43 @@ def get_winners ():
     
     pass
 
-# def get_info_about_artist (artist):
+def get_info_about_artist (artist):
+    nom_dict = retrieve_listings()
+    winner_dict = get_winners()
+    artist_nom_info = {}
+    artist_winning_info = {}
+
+    for award_name, list_noms in nom_dict.items():
+        for nom in list_noms:
+            if artist in nom:
+                if artist not in artist_nom_info:
+                    artist_nom_info[artist] = []
+                artist_nom_info[artist].append(award_name)
+
+    for award_name, winner_list in winner_dict.items():
+        if artist in winner_list:
+            artist_winning_info[artist] = award_name
+
+
+    if artist in artist_nom_info:
+        print(f"The artist {artist} was nominated for {len(artist_nom_info[artist])} award(s): {artist_nom_info[artist]}.")
+    else:
+        print(f"The artist {artist} was not nominated for any awards.")
+
+    if artist in artist_winning_info:
+        print(f"They won the {artist_winning_info[artist]} award.")
+    else:
+        print(f"They did not win any awards.")
+    
+    pass
+        
 
 
 def main (): 
     retrieve_listings()
     get_winners()
+    artist = "Some Artist"
+    get_info_about_artist(artist)
 
     
 
