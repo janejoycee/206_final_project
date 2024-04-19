@@ -9,100 +9,110 @@ import unittest
 
 def retrieve_listings(): 
 
-    relative_path = "/2023/02/02/1153442645/2023-grammy-awards-nominees-winners"
+    relative_path = "/2023/02/grammys-2023-full-list-of-winners.html"
 
-    base_url = "https://www.npr.org"
+    base_url = "https://www.vulture.com/"
     full_url = base_url + relative_path
 
-    # Fetch HTML content from the URL
+    
     response = requests.get(full_url)
+    if response.status_code != 200:  # Checks if the request was successful
+        print('Failed to retrieve content.')
+        return None
     html_content = response.text
 
     # Parse the HTML content using BeautifulSoup
     soup = BeautifulSoup(html_content, 'html.parser')
 
-
-    genre_dic = {}
     award_dic = {}
-    nominee_dic = {}
-    winner_dic = {}
-    title_regex = r'\d+\.\s*(.+)'
 
-    genres = soup.find_all('h3', class_='edTag')
-    #print(genres)
-
-    strong_tags_inside_p = soup.find_all('p')  # Find all <p> tags
-    for p_tag in strong_tags_inside_p:
-        strong_tags = p_tag.find_all('strong')  # Find all <strong> tags inside each <p> tag
-        for strong_tag in strong_tags:
-            strong_text = strong_tag.get_text()
-            match = re.match(title_regex, strong_text)
-            if match:
-                title = match.group(1)
-                #print(title)
-
-    song_and_artist_noms = soup.find_all('li', class_='edTag')
-    #print(song_and_artist_noms)
-
-    for item in song_and_artist_noms:
-        text = item.text
-        print(text)
-        # listing_pattern = r'\/(\d+)'
-        # new_list = []
-        # id_list = []
-        # returned_list = []
-
-        # listing_names = soup.find_all('div', class_='t1jojoys')
-        # listing_ids = soup.find_all('a', class_='l1j9v1wn bn2bl2p dir dir-ltr')
-
-        # for listing in listing_names:
-        #     new_list.append(listing.text)
-
-        # for id in listing_ids:
-        #     id_list.append(id.get('href'))
-
-        # for itm in id_list:
-        #     matchs = re.findall(listing_pattern, itm)
-        #     for match in matchs:
-        #         if match not in id_list:
-        #             listings_data.append(match)
-
-        # for i in range(len(new_list)):
-        #     returned_list.append((new_list[i],listings_data[i]))
-        
-        # #print(returned_list)
-        # return returned_list
-
-
-    """
-    make_listing_database(html_file) -> list
-
-    [('Loft in Mission District', '1944564'), ('Home in Mission District', '49043049'), ...]
-
-    TODO Write a function that takes in a variable representing the path of the search_results.html file then calls the functions retrieve_listings() and listing_details() in order to create and return the complete listing information. 
+    categories =  soup.find_all('p', class_='clay-paragraph')
     
-    This function will use retrieve_listings() to create an initial list of Airbnb listings. Then use listing_details() to obtain additional information about the listing to create a complete listing, and return this information in the structure: 
+    for category in categories:
+        award_name_element = category.find('strong')
+        if award_name_element:
+            award_name = award_name_element.text.strip()
+            award_name_element.extract()
+        else:
+            continue
+        
+        nominee_lines = list(category.stripped_strings)
+        #print((nominee_lines))
 
-        [
-        (Listing Title 1,Listing ID 1,Policy Number 1, Host Name(s) 1, Place Type 1, Average Review Score 1, Nightly Rate 1),
-        (Listing Title 2,Listing ID 2,Policy Number 2, Host Name(s) 2, Place Type 2, Average Review Score 2, Nightly Rate 2), 
-        ... 
-        ]
+        combined_list = []
+        # pattern = re.compile(r'“(.*?)”\s*—\s*(.*)')
+        prev_string = ""
+        for line in nominee_lines:
+            if '—' in line:
+                if prev_string:
+                    line = prev_string + ' ' + line
+                combined_list.append(line)
+                prev_string = ""  
+            else:
+                prev_string = line  
 
-    NOTE: retrieve_listings() returns a list of tuples where the tuples are of length 2, listing_details() returns just a tuple of length 5, and THIS FUNCTION returns a list of tuples where the tuples are of length 7. 
+            if prev_string:  
+                combined_list.append(prev_string)
 
-    Example output: 
-        [('Loft in Mission District', '1944564', '2022-004088STR', 'Brian', 'Entire Room', 4.98, 181), ('Home in Mission District', '49043049', 'Cherry', 'Pending', 'Entire Room', 4.93, 147), ...]    
-    """
+        #print(combined_list)
+        award_dic[award_name] = combined_list
+
+    print(award_dic)
+   # print(len(award_dic))
+    
+    return award_dic
+
+
+
+def get_winners ():
+
+    relative_path = "/2023/02/grammys-2023-full-list-of-winners.html"
+
+    base_url = "https://www.vulture.com/"
+    full_url = base_url + relative_path
+
+    
+    response = requests.get(full_url)
+    if response.status_code != 200:  # Checks if the request was successful
+        print('Failed to retrieve content.')
+        return None
+    html_content = response.text
+
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    winner_dict = {}
+
+    categories =  soup.find_all('p', class_='clay-paragraph')
+
+    for award_list in categories:
+        strong_elements = award_list.find_all('strong')
+        #print(strong_elements)
+
+        if len(strong_elements) >= 2:
+            award_name = strong_elements[0].get_text(strip=True)
+            winner = strong_elements[1].get_text(strip=True)
+            #print(f"The winner for {award_name} is {winner}")
+            winner_dict[award_name] = winner
+        else:
+            print("Not enough <strong> elements within this category to determine the award and the winner.")
+
+    #print(winner_dict)
+    #print(len(winner_dict))
+    return winner_dict
+
+    
     pass
 
+# def get_info_about_artist (artist):
 
 
 def main (): 
     retrieve_listings()
+    get_winners()
+
     
 
 
 if __name__ == '__main__':
     main()
-    unittest.main(verbosity=2)
+    #unittest.main(verbosity=2)
