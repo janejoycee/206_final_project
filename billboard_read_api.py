@@ -37,7 +37,7 @@ def get_rank_artist_data(date):
                 if artist_name not in top_100_artist_dict:
                     top_100_artist_dict[artist_name] = artist_info
             else:
-                print("Billboard Top Artist Chart Not Found")
+                print ("Billboard Top Artist Chart Not Found")
 
     return top_100_artist_dict
 
