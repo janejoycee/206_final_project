@@ -27,13 +27,16 @@ def get_start_id():
     with open('grammy_start_id.txt', 'r') as file:
         return int(file.readline())
     
-def insert_grammy_data(cur, conn, listing_data, winners_data):
-    for award, nominees in listing_data.items():
+def insert_grammy_data(cur, conn, listing_data, winners_data, artist_list):
+    for award, nominees in listing_data.items(): 
         for nominee in nominees:
-            cur.execute("""
-            INSERT INTO Grammy (grammy_artist_name, nominations)
-            VALUES (?, ?)
-            """, (nominee, award))
+            if nominee in artist_list:
+                artist_list.get(nominee)
+                cur.execute("""
+                INSERT INTO Grammy (nominations)
+                WHERE grammy_artist_name = ?
+                VALUE (?)
+                """, (nominee, award))
 
     for award, winner in winners_data.items():
         cur.execute("""
@@ -55,4 +58,4 @@ def main(date):
     update_start_id(start_id + 25)
 
 if __name__ == "__main__":
-    main()
+     main('2023-05-01')
