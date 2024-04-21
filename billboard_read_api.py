@@ -47,8 +47,6 @@ def get_artist_list(date):
     artist_list = list(artist_dict.keys())
     return artist_list
 
-
-
     
 def main():
     '''

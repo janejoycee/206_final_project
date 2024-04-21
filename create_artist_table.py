@@ -1,10 +1,6 @@
 import sqlite3
-import os
-import json
 from billboard_read_api import get_artist_list
 
-import sqlite3
-from billboard_read_api import get_artist_list
 
 def create_artist_table(cur, conn, artist_list, start_id):
     limit = 25

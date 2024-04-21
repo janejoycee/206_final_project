@@ -1,9 +1,5 @@
 from bs4 import BeautifulSoup
 import requests
-import re
-import os
-import csv
-import unittest
 
 
 
@@ -96,7 +92,7 @@ def get_winners ():
         #else:
             #print("Not enough <strong> elements within this category to determine the award and the winner.")
 
-    #print(winner_dict)
+    print(winner_dict)
     #print(len(winner_dict))
     return winner_dict
 
