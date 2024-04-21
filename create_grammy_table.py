@@ -10,6 +10,8 @@ conn = sqlite3.connect('artist.db')
 cur = conn.cursor()
 
 def create_grammy_table(cur, conn, artist_list, start_id):
+
+
     limit = 25
     cur.execute("CREATE TABLE IF NOT EXISTS Grammy (grammy_artist_id INTEGER PRIMARY KEY, grammy_artist_name TEXT, nominations TEXT, winning_awards TEXT)")
 
@@ -30,13 +32,22 @@ def get_start_id():
 def insert_grammy_data(cur, conn, listing_data, winners_data, artist_list):
     for award, nominees in listing_data.items(): 
         for nominee in nominees:
-            if nominee in artist_list:
-                artist_list.get(nominee)
+            #print(nominee)
+
+            #artist_name = nominee.split('—')[1].strip()  # Assuming the artist name follows the pattern "Song Title — Artist Name"
+
+            cur.execute("""
+            SELECT * FROM Grammy WHERE grammy_artist_name = ?
+            """, (nominee,))
+            existing_record = cur.fetchone()
+
+            if existing_record:
+    
                 cur.execute("""
-                INSERT INTO Grammy (nominations)
-                WHERE grammy_artist_name = ?
-                VALUE (?)
-                """, (nominee, award))
+                UPDATE Grammy SET nominations = nominations || ', ' || ? WHERE grammy_artist_name = ?
+                """, (award, nominee))
+            else:
+                continue
 
     for award, winner in winners_data.items():
         cur.execute("""
@@ -54,7 +65,7 @@ def main(date):
     artist_list = get_artist_list(date)
 
     create_grammy_table(cur, conn, artist_list, start_id)
-    insert_grammy_data(cur, conn, listing_data, winners_data)
+    insert_grammy_data(cur, conn, listing_data, winners_data, artist_list)
     update_start_id(start_id + 25)
 
 if __name__ == "__main__":
