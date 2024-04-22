@@ -13,7 +13,13 @@ def create_grammy_table(cur, conn, artist_list, start_id):
 
 
     limit = 25
-    cur.execute("CREATE TABLE IF NOT EXISTS Grammy (grammy_artist_id INTEGER PRIMARY KEY, grammy_artist_name TEXT, nominations TEXT, winning_awards TEXT)")
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS Grammy (
+            grammy_artist_id INTEGER PRIMARY KEY,
+            grammy_artist_name TEXT,
+            nominations TEXT DEFAULT '',
+            winning_awards TEXT DEFAULT '')
+        """)
 
     for i in range(start_id, start_id + limit):
         if i < len(artist_list):
@@ -34,11 +40,18 @@ def insert_grammy_data(cur, conn, listing_data, winners_data, artist_list):
         for nominee in nominees:
             #print(nominee)
 
-            #artist_name = nominee.split('—')[1].strip()  # Assuming the artist name follows the pattern "Song Title — Artist Name"
-
+            for nominee in nominees:
+    # Check if the '—' character is in the nominee string
+                if '—' in nominee:
+                    artist_name = nominee.split('—')[1].strip()  # Extract the artist name
+                else:
+                    # Handle the error or skip the entry
+                    artist_name = nominee
+                    
             cur.execute("""
             SELECT * FROM Grammy WHERE grammy_artist_name = ?
-            """, (nominee,))
+            """, (artist_name,))
+            
             existing_record = cur.fetchone()
 
             if existing_record:
