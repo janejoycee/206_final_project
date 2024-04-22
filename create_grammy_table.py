@@ -35,32 +35,24 @@ def get_start_id():
     with open('grammy_start_id.txt', 'r') as file:
         return int(file.readline())
     
-def insert_grammy_data(cur, conn, listing_data, winners_data, artist_list):
-    for award, nominees in listing_data.items(): 
-        for nominee in nominees:
-            #print(nominee)
-
-            for nominee in nominees:
-    # Check if the '—' character is in the nominee string
-                if '—' in nominee:
-                    artist_name = nominee.split('—')[1].strip()  # Extract the artist name
-                else:
-                    # Handle the error or skip the entry
-                    artist_name = nominee
-                    
-            cur.execute("""
-            SELECT * FROM Grammy WHERE grammy_artist_name = ?
-            """, (artist_name,))
-            
-            existing_record = cur.fetchone()
-
-            if existing_record:
-    
-                cur.execute("""
-                UPDATE Grammy SET nominations = nominations || ', ' || ? WHERE grammy_artist_name = ?
-                """, (award, nominee))
+def insert_grammy_data(cur, conn, listing_data, artist_list):
+    for award, nominees in listing_data.items():
+        for nominee_with_song in nominees:
+            if '—' in nominee_with_song:
+                artist_name = nominee_with_song.split('—')[1].strip()
             else:
-                continue
+                artist_name = nominee_with_song
+            
+            if artist_name in artist_list:
+                cur.execute("SELECT * FROM Grammy WHERE grammy_artist_name = ?", (artist_name,))
+                existing_record = cur.fetchone()
+
+                if existing_record:
+                    cur.execute("UPDATE Grammy SET nominations = nominations || ', ' || ? WHERE grammy_artist_name = ?", (award, artist_name,))
+                else:
+
+                    pass
+    conn.commit()
 
     for award, winner in winners_data.items():
         cur.execute("""

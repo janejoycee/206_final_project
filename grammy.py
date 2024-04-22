@@ -53,7 +53,7 @@ def retrieve_listings():
         #print(combined_list)
         award_dic[award_name] = combined_list
 
-    #print(award_dic)
+    print(award_dic)
    # print(len(award_dic))
     
     return award_dic
