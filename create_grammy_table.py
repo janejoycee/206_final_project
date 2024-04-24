@@ -4,6 +4,8 @@ from billboard_read_api import get_artist_list
 
 def create_grammy_table(cur, conn, start_id, listing_data, winners_data, artist_list):
 
+    #cur.execute ("""DROP TABLE IF EXISTS Grammys """)
+
     limit = 25
 
     cur.execute("""
@@ -18,13 +20,14 @@ def create_grammy_table(cur, conn, start_id, listing_data, winners_data, artist_
             grammy_award TEXT UNIQUE)
     """)
 
-    # cur.execute(""" CREATE TABLE IF NOT EXISTS ArtistAwards (
-    #     artist_id INTEGER,
-    #     award_id INTEGER,
-    #     FOREIGN KEY (artist_id) REFERENCES Grammy_artists (artist_id),
-    #     FOREIGN KEY (award_id) REFERENCES Grammy_awards (award_id),
-    #     PRIMARY KEY (artist_id, award_id) )
-    # """)
+    cur.execute("""CREATE TABLE IF NOT EXISTS Grammys (
+        artist_id INTEGER,
+        award_id INTEGER,
+        FOREIGN KEY (artist_id) REFERENCES Grammy_artists (grammy_artist_id),
+        FOREIGN KEY (award_id) REFERENCES Grammy_awards (grammy_awards_id),
+        PRIMARY KEY (artist_id, award_id)
+    )""")
+
 
     
     artist_info = {}
@@ -57,7 +60,7 @@ def create_grammy_table(cur, conn, start_id, listing_data, winners_data, artist_
                 win_list.append(winning_award)
         artist_info[artist].append({'winner' : win_list})       
 
-    print(artist_info)
+    #print(artist_info)
 
     #print((list(artist_info.keys())))
     
@@ -71,10 +74,28 @@ def create_grammy_table(cur, conn, start_id, listing_data, winners_data, artist_
             for artist in list(artist_info.keys()):
                 cur.execute("INSERT OR IGNORE INTO Grammy_artists (grammy_artist_name) VALUES (?)", (artist,))
     
-    # for i in range(start_id, start_id + limit):
-    #     if i < len(artist_list):
-    #         cur.execute("""SELECT Grammy_artists.grammy_artist_name, Grammy_awards.award_name FROM Grammy_awards 
-    #                     INNER JOIN Grammy_artists ON Grammy_artists.artist_id = Grammy_awards.winner_id;""")
+    for i in range(start_id, start_id + limit):
+        if i < len(artist_list):
+            for artist, data in artist_info.items():
+    # Default to an empty list if 'winner' is not found
+                awards_won = []
+                for item in data:
+                    awards_won = item.get('winner', [])
+                    if awards_won:  # This will be True if 'awards_won' is not empty
+                        for award in awards_won:
+                            cur.execute("""SELECT grammy_awards_id from Grammy_awards WHERE grammy_award = ? """, (award,))
+                            award_ids = cur.fetchall()
+                            print(award_ids)
+                            for grammy_awards_id_tuple in award_ids:
+                                # Unpack the tuple to get the actual ID
+                                (grammy_awards_id,) = grammy_awards_id_tuple
+                                cur.execute("""
+                                        INSERT OR IGNORE INTO Grammys (artist_id, award_id)
+                                        SELECT Grammy_artists.grammy_artist_id, Grammy_awards.grammy_awards_id
+                                        FROM Grammy_artists, Grammy_awards 
+                                        WHERE Grammy_artists.grammy_artist_name = ? AND Grammy_awards.grammy_award = ?
+                                    """, (artist, grammy_awards_id))
+    #print("done")
     conn.commit()
 
 
