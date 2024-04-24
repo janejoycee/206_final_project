@@ -73,7 +73,9 @@ def create_grammy_table(cur, conn, start_id, listing_data, winners_data, artist_
         if i < len(artist_list):
             for artist in list(artist_info.keys()):
                 cur.execute("INSERT OR IGNORE INTO Grammy_artists (grammy_artist_name) VALUES (?)", (artist,))
-    
+
+    temp_bucket = []
+
     for i in range(start_id, start_id + limit):
         if i < len(artist_list):
             for artist, data in artist_info.items():
@@ -90,15 +92,26 @@ def create_grammy_table(cur, conn, start_id, listing_data, winners_data, artist_
                             award_id = cur.fetchone()
                             if award_id:
                                 grammy_awards_id = award_id[0]
+                                if award_id not in temp_bucket:
+                                    temp_bucket.append(grammy_awards_id)
+                                    cur.execute("""
+                                        INSERT OR IGNORE INTO Grammys (artist_id, award_id)
+                                        SELECT Grammy_artists.grammy_artist_id, Grammy_awards.grammy_awards_id
+                                        FROM Grammy_artists, Grammy_awards 
+                                        WHERE Grammy_artists.grammy_artist_name = ? AND Grammy_awards.grammy_awards_id = ?
+                                    """, (artist, grammy_awards_id))
+                                else:
+                                    continue
 
-                                cur.execute("""
-                                    SELECT COUNT(*) FROM Grammys
-                                    INNER JOIN Grammy_artists ON Grammys.artist_id = Grammy_artists.grammy_artist_id
-                                    WHERE Grammy_artists.grammy_artist_name = ? AND Grammys.award_id = ?
-                                """, (artist, grammy_awards_id))
-                                exists = cur.fetchone()[0] > 0
+                                # cur.execute("""
+                                #     SELECT COUNT(*) FROM Grammys
+                                #     INNER JOIN Grammy_artists ON Grammys.artist_id = Grammy_artists.grammy_artist_id
+                                #     WHERE Grammy_artists.grammy_artist_name = ? AND Grammys.award_id = ?
+                                # """, (artist, grammy_awards_id))
+                                # exists = cur.fetchone()[0] > 0
+                                
 
-                                if not exists:
+                                # if not exists:
                                     cur.execute("""
                                         INSERT INTO Grammys (artist_id, award_id)
                                         SELECT Grammy_artists.grammy_artist_id, ?
@@ -108,6 +121,7 @@ def create_grammy_table(cur, conn, start_id, listing_data, winners_data, artist_
 
     print("done")
     conn.commit()
+    pass
 
 def update_start_id(start_id):
     with open('grammy_start_id.txt', 'w') as file:
