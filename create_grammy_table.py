@@ -82,7 +82,7 @@ def create_grammy_table(cur, conn, start_id, listing_data, winners_data, artist_
                 awards_won = []
                 for item in data:
                     awards_won = item.get('winner', [])
-                    if awards_won:  # This will be True if 'awards_won' is not empty
+                    if awards_won:  
                         for award in awards_won:
                             cur.execute("""
                                 SELECT grammy_awards_id FROM Grammy_awards WHERE grammy_award = ?
@@ -91,7 +91,6 @@ def create_grammy_table(cur, conn, start_id, listing_data, winners_data, artist_
                             if award_id:
                                 grammy_awards_id = award_id[0]
 
-                                # Check if the record already exists in Grammys table for this artist and award
                                 cur.execute("""
                                     SELECT COUNT(*) FROM Grammys
                                     INNER JOIN Grammy_artists ON Grammys.artist_id = Grammy_artists.grammy_artist_id
@@ -100,7 +99,6 @@ def create_grammy_table(cur, conn, start_id, listing_data, winners_data, artist_
                                 exists = cur.fetchone()[0] > 0
 
                                 if not exists:
-                                    # Insert the record if it doesn't exist
                                     cur.execute("""
                                         INSERT INTO Grammys (artist_id, award_id)
                                         SELECT Grammy_artists.grammy_artist_id, ?
