@@ -77,27 +77,39 @@ def create_grammy_table(cur, conn, start_id, listing_data, winners_data, artist_
     for i in range(start_id, start_id + limit):
         if i < len(artist_list):
             for artist, data in artist_info.items():
-    # Default to an empty list if 'winner' is not found
+                if artist == "" or artist == "J":
+                    continue
                 awards_won = []
                 for item in data:
                     awards_won = item.get('winner', [])
                     if awards_won:  # This will be True if 'awards_won' is not empty
                         for award in awards_won:
-                            cur.execute("""SELECT grammy_awards_id from Grammy_awards WHERE grammy_award = ? """, (award,))
-                            award_ids = cur.fetchall()
-                            print(award_ids)
-                            for grammy_awards_id_tuple in award_ids:
-                                # Unpack the tuple to get the actual ID
-                                (grammy_awards_id,) = grammy_awards_id_tuple
-                                cur.execute("""
-                                        INSERT OR IGNORE INTO Grammys (artist_id, award_id)
-                                        SELECT Grammy_artists.grammy_artist_id, Grammy_awards.grammy_awards_id
-                                        FROM Grammy_artists, Grammy_awards 
-                                        WHERE Grammy_artists.grammy_artist_name = ? AND Grammy_awards.grammy_award = ?
-                                    """, (artist, grammy_awards_id))
-    #print("done")
-    conn.commit()
+                            cur.execute("""
+                                SELECT grammy_awards_id FROM Grammy_awards WHERE grammy_award = ?
+                            """, (award,))
+                            award_id = cur.fetchone()
+                            if award_id:
+                                grammy_awards_id = award_id[0]
 
+                                # Check if the record already exists in Grammys table for this artist and award
+                                cur.execute("""
+                                    SELECT COUNT(*) FROM Grammys
+                                    INNER JOIN Grammy_artists ON Grammys.artist_id = Grammy_artists.grammy_artist_id
+                                    WHERE Grammy_artists.grammy_artist_name = ? AND Grammys.award_id = ?
+                                """, (artist, grammy_awards_id))
+                                exists = cur.fetchone()[0] > 0
+
+                                if not exists:
+                                    # Insert the record if it doesn't exist
+                                    cur.execute("""
+                                        INSERT INTO Grammys (artist_id, award_id)
+                                        SELECT Grammy_artists.grammy_artist_id, ?
+                                        FROM Grammy_artists 
+                                        WHERE Grammy_artists.grammy_artist_name = ?
+                                    """, (grammy_awards_id, artist))
+
+    print("done")
+    conn.commit()
 
 def update_start_id(start_id):
     with open('grammy_start_id.txt', 'w') as file:
