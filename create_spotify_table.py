@@ -4,15 +4,15 @@ from spotify_read_api import spotify_artist_information
 artist_info = spotify_artist_information('2023-05-01')
 
 
-def create_spotify_table(cur, conn, start_id):
-    cur.execute("CREATE TABLE IF NOT EXISTS Spotify (spotify_artist_id INTEGER PRIMARY KEY, spotify_artist_name TEXT, follower_count INTEGER)")
-    for i in range(start_id, start_id + 25):
-        if i < len(artist_info):
-            artist = list(artist_info.keys())[i]
-            follower_count = artist_info[artist]['followers']
-            cur.execute("INSERT OR IGNORE INTO Spotify (spotify_artist_id, spotify_artist_name, follower_count) VALUES (?, ?, ?)",
-                        (i, artist, follower_count))
-    conn.commit()
+# def create_spotify_table(cur, conn, start_id):
+#     cur.execute("CREATE TABLE IF NOT EXISTS Spotify (spotify_artist_id INTEGER PRIMARY KEY, spotify_artist_name TEXT, follower_count INTEGER)")
+#     for i in range(start_id, start_id + 25):
+#         if i < len(artist_info):
+#             artist = list(artist_info.keys())[i]
+#             follower_count = artist_info[artist]['followers']
+#             cur.execute("INSERT OR IGNORE INTO Spotify (spotify_artist_id, spotify_artist_name, follower_count) VALUES (?, ?, ?)",
+#                         (i, artist, follower_count))
+#     conn.commit()
 
 def add_spotify_info(cur, conn, start_id):
     cur.execute("CREATE TABLE IF NOT EXISTS Spotify_followers (spotify_artist_id INTEGER PRIMARY KEY, follower_count INTEGER)")
