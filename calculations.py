@@ -1,4 +1,5 @@
 import sqlite3
+import matplotlib.pyplot as plt
 
 
 ### PART 3 - Process the data (50 points) - after you have gathered all your data.
@@ -75,7 +76,34 @@ def join_tables(conn, cursor):
         print("Error reading data from SQLite tables:", e)
 
 
+def top_ten_followers(conn, cursor):
+    try:
+        # Execute SQL query to get the top ten follower artists
+        cursor.execute("""
+            SELECT a.name, REPLACE(CAST(f.follower_count AS TEXT), ',', '') as formatted_follower_count
+            FROM Spotify_followers AS f
+            JOIN artist AS a ON f.spotify_artist_id = a.identification
+            ORDER BY f.follower_count DESC
+            LIMIT 10
+        """)
+        top_ten_data = cursor.fetchall()
+        conn.commit()
+        return top_ten_data
 
+    except sqlite3.Error as e:
+        print("Error reading data from SQLite tables:", e)
+
+def plot_bar_chart(data):
+    artist_names = [row[0] for row in data]
+    follower_counts = [int(row[1]) / 1_000_000 for row in data]  # Convert follower counts to millions
+
+    plt.figure(figsize=(10, 6))
+    plt.barh(artist_names, follower_counts, color='skyblue')
+    plt.xlabel('Number of Followers (Millions)')
+    plt.ylabel('Artist Name')
+    plt.title('Top Ten Follower Artists')
+    plt.gca().invert_yaxis()
+    plt.show()
 
 
         
@@ -135,6 +163,14 @@ def main(date):
                 print(f"{artist_name:<{max_name_width}} | {formatted_follower_count} | {popularity_index:<{max_popularity_index_width}}")
         else:
             print("No data found.") 
+
+
+    top_ten_data = top_ten_followers(conn, cur)
+    if top_ten_data:
+        plot_bar_chart(top_ten_data)
+    else:
+        print("No data found.")
+
 
         
 
