@@ -1,3 +1,16 @@
 AVG NUM OF FOLLOWERS = 21,116,306.23
 AVG POPULARITY INDEX = 78.99
 AVG GRAMMY NOMINATION = 0.37
+
+Top Ten Nominations:
+1. Artist: Adele, Nominations: 6
+2. Artist: Harry Styles, Nominations: 5
+3. Artist: Kendrick Lamar, Nominations: 4
+4. Artist: Lizzo, Nominations: 4
+5. Artist: Doja Cat, Nominations: 4
+6. Artist: Bad Bunny, Nominations: 3
+7. Artist: Steve Lacy, Nominations: 3
+8. Artist: Latto, Nominations: 2
+9. Artist: Taylor Swift, Nominations: 1
+10. Artist: Luke Combs, Nominations: 1
+AVG GRAMMY NOMINATION FOR TOP TEN ARTISTS: 3.3
