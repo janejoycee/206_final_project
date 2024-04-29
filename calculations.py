@@ -9,9 +9,18 @@ import numpy as np
 # occur on a particular day of the week or the average of the number of items per day.
 # You must do at least one database join to select your data for your calculations or
 
+
+### PART 4 – Visualize the data (50 points)
+# ● If you have 2 people in your group you must create at least 2 visualizations of the
+# calculated data. If you have 3 people you must create at least 3 visualizations. You are
+# free to choose any visualization tool/software that you can create with Python code.
+# ● You will not earn the full 50 points if your visualizations don't go beyond the examples
+# you were given in lecture. If you use an example from lecture, you should change
+# something from the example you were given in lecture, such as change the colors of the
+# bars in a bar chart for example.
+
 def calculate_average_follower_count(conn, cursor):
     try:
-        # Execute SQL query to get the average follower count
         cursor.execute("SELECT AVG(follower_count) FROM Spotify_followers")
         average_follower_count = cursor.fetchone()[0]
         conn.commit()
@@ -45,11 +54,10 @@ def calculate_average_grammy_nomination(conn, cursor):
 
 def find_top_ten(conn, cursor):
     try:
-        # Execute SQL query to get the top ten nominations
         cursor.execute("SELECT * FROM Grammy_billboard_artists ORDER BY nominations_num DESC LIMIT 10")
-        top_ten_nominations = cursor.fetchall()
+        top_twenty_nominations = cursor.fetchall()
         conn.commit()
-        return top_ten_nominations
+        return top_twenty_nominations
 
     except sqlite3.Error as e:
         print("Error reading data from SQLite table:", e)
@@ -60,7 +68,6 @@ def find_top_ten(conn, cursor):
 
 def join_tables(conn, cursor):
     try:
-        # Execute SQL query to join the tables and retrieve desired columns
         cursor.execute("""
             SELECT a.name, f.follower_count, p.popularity_index
             FROM Spotify_followers AS f
@@ -77,37 +84,35 @@ def join_tables(conn, cursor):
         print("Error reading data from SQLite tables:", e)
 
 
-def top_ten_followers(conn, cursor):
+def top_twenty_followers(conn, cursor):
     try:
-        # Execute SQL query to get the top ten follower artists
         cursor.execute("""
             SELECT a.name, REPLACE(CAST(f.follower_count AS TEXT), ',', '') as formatted_follower_count
             FROM Spotify_followers AS f
             JOIN artist AS a ON f.spotify_artist_id = a.identification
             ORDER BY f.follower_count DESC
-            LIMIT 10
+            LIMIT 20
         """)
-        top_ten_data = cursor.fetchall()
+        top_twenty_data = cursor.fetchall()
         conn.commit()
-        return top_ten_data
+        return top_twenty_data
 
     except sqlite3.Error as e:
         print("Error reading data from SQLite tables:", e)
 
 
-def top_ten_popularity(conn, cursor):
+def top_twenty_popularity(conn, cursor):
     try:
-        # Execute SQL query to get the top ten artists by popularity index
         cursor.execute("""
             SELECT a.name, p.popularity_index
             FROM Spotify_popularity AS p
             JOIN artist AS a ON p.spotify_artist_id = a.identification
             ORDER BY p.popularity_index DESC
-            LIMIT 10
+            LIMIT 20
         """)
-        top_ten_data = cursor.fetchall()
+        top_twenty_data = cursor.fetchall()
         conn.commit()
-        return top_ten_data
+        return top_twenty_data
 
     except sqlite3.Error as e:
         print("Error reading data from SQLite tables:", e)
@@ -121,7 +126,7 @@ def plot_bar_chart_followers(data):
     plt.barh(artist_names, follower_counts, color='skyblue')
     plt.xlabel('Number of Followers (Millions)')
     plt.ylabel('Artist Name')
-    plt.title('Top Ten Follower Artists')
+    plt.title('Top Twenty Most Followed Spotify Artists')
     plt.gca().invert_yaxis()
     plt.show()
 
@@ -134,7 +139,7 @@ def plot_bar_chart_popularity(data):
     bars = plt.barh(artist_names, popularity_index, color='pink')
     plt.xlabel('Popularity Index')
     plt.ylabel('Artist Name')
-    plt.title('Top Ten Artists by Popularity Index')
+    plt.title('Top Twenty Spotify Artists with Highest Popularity Index')
     plt.gca().invert_yaxis()
     plt.xlim(80, 100)  # Set x-axis limits from 80 to 100
     
@@ -154,7 +159,7 @@ def plot_dual_bar_graph(follower_data, popularity_data):
 
     fig, ax1 = plt.subplots(figsize=(12, 6))
 
-    # Define width of each bar
+    #width of each bar
     bar_width = 0.35
 
     # Calculate x-axis positions for the bars
@@ -163,7 +168,7 @@ def plot_dual_bar_graph(follower_data, popularity_data):
     # Plot follower count as the first bar graph on the left y-axis
     color1 = 'skyblue'
     ax1.bar(x - bar_width/2, follower_counts, color=color1, width=bar_width, label='Follower Count (Millions)')
-    ax1.set_xlabel('Artist Name')
+    ax1.set_xlabel('Artist Name: Top 20 # of Followers')
     ax1.set_ylabel('Follower Count (Millions)')
     ax1.tick_params(axis='y', labelcolor=color1)
     ax1.set_xticks(x)
@@ -184,7 +189,7 @@ def plot_dual_bar_graph(follower_data, popularity_data):
     for i, index in enumerate(popularity_index):
         ax2.text(x[i] + bar_width/2, index + 1, str(index), ha='center', va='bottom')
 
-    plt.title('Top Ten Artists: Follower Count and Popularity Index')
+    plt.title('Top Twenty Artists: Follower Count and Popularity Index')
 
     # Show legend for both bar graphs
     lines1, labels1 = ax1.get_legend_handles_labels()
@@ -193,6 +198,50 @@ def plot_dual_bar_graph(follower_data, popularity_data):
 
     plt.tight_layout()
 
+
+
+def plot_dual_bar_graph_popularity(popularity_data, follower_data):
+    artist_names = [row[0] for row in popularity_data]
+    popularity_index = [row[1] for row in popularity_data]
+    follower_counts = [int(row[1]) / 1_000_000 for row in follower_data]  # Convert follower counts to millions
+
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+
+    # Calculate x-axis positions for the data points
+    x = np.arange(len(artist_names))
+
+    # Plot popularity index as a line on the left y-axis
+    color1 = 'green'
+    ax1.plot(x, popularity_index, marker='o', color=color1, label='Popularity Index')
+    ax1.set_xlabel('Artist Name: Top 20 Highest Popularity Index')
+    ax1.set_ylabel('Popularity Index')
+    ax1.tick_params(axis='y', labelcolor=color1)
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(artist_names, rotation=45, ha='right')
+    ax1.set_ylim(80, 100)  # Adjust y-axis limits for popularity index from 80 to 100
+
+    # Add popularity index values above the line
+    for i, index in enumerate(popularity_index):
+        ax1.text(x[i], index + 1, str(index), ha='center', va='bottom')
+
+    # Create a secondary y-axis for follower count
+    ax2 = ax1.twinx()
+
+    # Plot follower count as a line on the right y-axis
+    color2 = 'blue'
+    ax2.plot(x, follower_counts, marker='o', color=color2, label='Follower Count (Millions)')
+    ax2.set_ylabel('Follower Count (Millions)')
+    ax2.tick_params(axis='y', labelcolor=color2)
+    ax2.set_ylim(0, max(follower_counts) * 1.1)  # Adjust y-axis limits for better visibility
+
+    plt.title('Top Twenty Artists: Popularity Index and Follower Count')
+
+    # Show legend for both lines
+    lines1, labels1 = ax1.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax2.legend(lines1 + lines2, labels1 + labels2, loc='upper left')
+
+    plt.tight_layout()
 
         
 
@@ -205,6 +254,7 @@ def main(date):
     with open('final_calculations.txt', 'w') as f:
         output = calculate_average_follower_count(conn, cur)
         formatted_avg_follower_count = "{:,.2f}".format(output)
+        f.write("Most Popular Artists on Spotify:\n\n")
         f.write(f"AVG NUM OF FOLLOWERS = {formatted_avg_follower_count}\n")
 
 
@@ -214,19 +264,19 @@ def main(date):
 
         nom_output = calculate_average_grammy_nomination(conn, cur)
         formatted_avg_grammy_nom = "{:,.2f}".format(nom_output)
-        f.write(f"AVG GRAMMY NOMINATION = {formatted_avg_grammy_nom}\n")
+        f.write(f"AVG GRAMMY NOMINATIONS = {formatted_avg_grammy_nom}\n")
 
 
         top_ten_nominations = find_top_ten(conn, cur)
         if top_ten_nominations:
             f.write("\nTop Ten Nominations:\n")
             for index, nomination in enumerate(top_ten_nominations, 1):
-                artist_name = nomination[0]  # Assuming the artist name is in the first column
-                nominations_num = nomination[1]  # Assuming the nominations number is in the second column
+                artist_name = nomination[0]  #bc artist name in first column 
+                nominations_num = nomination[1]  # nominations number is in the second column
                 f.write(f"{index}. Artist: {artist_name}, Nominations: {nominations_num}\n")
 
-            top_ten_avg = sum(nomination[1] for nomination in top_ten_nominations) / len(top_ten_nominations)
-            f.write(f"AVG GRAMMY NOMINATION FOR TOP TEN ARTISTS: {top_ten_avg}\n")
+            top_twenty_avg = sum(nomination[1] for nomination in top_ten_nominations) / len(top_ten_nominations)
+            f.write(f"\nAVG GRAMMY NOMINATION FOR TOP TEN ARTISTS: {top_twenty_avg}\n")
 
         else:
             f.write("No data found.")
@@ -253,28 +303,34 @@ def main(date):
             print("No data found.") 
 
 
-    top_ten_data = top_ten_followers(conn, cur)
-    if top_ten_data:
-        plot_bar_chart_followers(top_ten_data)
+    top_twenty_data = top_twenty_followers(conn, cur)
+    if top_twenty_data:
+        plot_bar_chart_followers(top_twenty_data)
     else:
         print("No data found.")
 
 
-    top_ten_data = top_ten_popularity(conn, cur)
-    if top_ten_data:
-        plot_bar_chart_popularity(top_ten_data)
+    top_twenty_data = top_twenty_popularity(conn, cur)
+    if top_twenty_data:
+        plot_bar_chart_popularity(top_twenty_data)
     else:
         print("No data found.")
         
 
-    top_ten_followers_data = top_ten_followers(conn, cur)
-    top_ten_popularity_data = top_ten_popularity(conn, cur)
-    plot_dual_bar_graph(top_ten_followers_data, top_ten_popularity_data)
+    top_twenty_followers_data = top_twenty_followers(conn, cur)
+    top_twenty_popularity_data = top_twenty_popularity(conn, cur)
+    plot_dual_bar_graph(top_twenty_followers_data, top_twenty_popularity_data)
 
     plt.show()
 
 
-        
+
+    top_twenty_popularity_data = top_twenty_popularity(conn, cur)
+    top_twenty_followers_data = top_twenty_followers(conn, cur)
+    plot_dual_bar_graph_popularity(top_twenty_popularity_data, top_twenty_followers_data)
+
+
+    plt.show()
 
 
     conn.close()
