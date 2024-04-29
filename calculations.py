@@ -1,5 +1,6 @@
 import sqlite3
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 ### PART 3 - Process the data (50 points) - after you have gathered all your data.
@@ -93,7 +94,26 @@ def top_ten_followers(conn, cursor):
     except sqlite3.Error as e:
         print("Error reading data from SQLite tables:", e)
 
-def plot_bar_chart(data):
+
+def top_ten_popularity(conn, cursor):
+    try:
+        # Execute SQL query to get the top ten artists by popularity index
+        cursor.execute("""
+            SELECT a.name, p.popularity_index
+            FROM Spotify_popularity AS p
+            JOIN artist AS a ON p.spotify_artist_id = a.identification
+            ORDER BY p.popularity_index DESC
+            LIMIT 10
+        """)
+        top_ten_data = cursor.fetchall()
+        conn.commit()
+        return top_ten_data
+
+    except sqlite3.Error as e:
+        print("Error reading data from SQLite tables:", e)
+
+
+def plot_bar_chart_followers(data):
     artist_names = [row[0] for row in data]
     follower_counts = [int(row[1]) / 1_000_000 for row in data]  # Convert follower counts to millions
 
@@ -104,6 +124,70 @@ def plot_bar_chart(data):
     plt.title('Top Ten Follower Artists')
     plt.gca().invert_yaxis()
     plt.show()
+
+
+def plot_bar_chart_popularity(data):
+    artist_names = [row[0] for row in data]
+    popularity_index = [row[1] for row in data]
+
+    plt.figure(figsize=(10, 6))
+    bars = plt.barh(artist_names, popularity_index, color='pink')
+    plt.xlabel('Popularity Index')
+    plt.ylabel('Artist Name')
+    plt.title('Top Ten Artists by Popularity Index')
+    plt.gca().invert_yaxis()
+    plt.xlim(80, 100)  # Set x-axis limits from 80 to 100
+    
+    # Add popularity index values to the right of the bars
+    for bar, index in zip(bars, popularity_index):
+        plt.text(bar.get_width() + 0.5, bar.get_y() + bar.get_height() / 2, f'{index:.2f}', va='center')
+
+    plt.show()
+
+
+
+
+def plot_dual_bar_graph(follower_data, popularity_data):
+    artist_names = [row[0] for row in follower_data]
+    follower_counts = [int(row[1]) / 1_000_000 for row in follower_data]  # Convert follower counts to millions
+    popularity_index = [row[1] for row in popularity_data]
+
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+
+    # Define width of each bar
+    bar_width = 0.35
+
+    # Calculate x-axis positions for the bars
+    x = np.arange(len(artist_names))
+
+    # Plot follower count as the first bar graph on the left y-axis
+    color1 = 'skyblue'
+    ax1.bar(x - bar_width/2, follower_counts, color=color1, width=bar_width, label='Follower Count (Millions)')
+    ax1.set_xlabel('Artist Name')
+    ax1.set_ylabel('Follower Count (Millions)')
+    ax1.tick_params(axis='y', labelcolor=color1)
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(artist_names, rotation=45, ha='right')
+    ax1.set_ylim(0, max(follower_counts) * 1.1)  # Adjust y-axis limits for better visibility
+
+    # Create a secondary y-axis for popularity index
+    ax2 = ax1.twinx()
+
+    # Plot popularity index as the second bar graph on the right y-axis
+    color2 = 'lightgreen'
+    ax2.bar(x + bar_width/2, popularity_index, color=color2, width=bar_width, label='Popularity Index')
+    ax2.set_ylabel('Popularity Index')
+    ax2.tick_params(axis='y', labelcolor=color2)
+    ax2.set_ylim(80, 100)  # Set y-axis limits for popularity index from 0 to 100
+
+    plt.title('Top Ten Artists: Follower Count and Popularity Index')
+
+    # Show legend for both bar graphs
+    lines1, labels1 = ax1.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax2.legend(lines1 + lines2, labels1 + labels2, loc='upper left')
+
+    plt.tight_layout()
 
 
         
@@ -167,9 +251,23 @@ def main(date):
 
     top_ten_data = top_ten_followers(conn, cur)
     if top_ten_data:
-        plot_bar_chart(top_ten_data)
+        plot_bar_chart_followers(top_ten_data)
     else:
         print("No data found.")
+
+
+    top_ten_data = top_ten_popularity(conn, cur)
+    if top_ten_data:
+        plot_bar_chart_popularity(top_ten_data)
+    else:
+        print("No data found.")
+        
+
+    top_ten_followers_data = top_ten_followers(conn, cur)
+    top_ten_popularity_data = top_ten_popularity(conn, cur)
+    plot_dual_bar_graph(top_ten_followers_data, top_ten_popularity_data)
+
+    plt.show()
 
 
         
