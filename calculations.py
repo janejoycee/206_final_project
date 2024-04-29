@@ -180,6 +180,10 @@ def plot_dual_bar_graph(follower_data, popularity_data):
     ax2.tick_params(axis='y', labelcolor=color2)
     ax2.set_ylim(80, 100)  # Set y-axis limits for popularity index from 0 to 100
 
+
+    for i, index in enumerate(popularity_index):
+        ax2.text(x[i] + bar_width/2, index + 1, str(index), ha='center', va='bottom')
+
     plt.title('Top Ten Artists: Follower Count and Popularity Index')
 
     # Show legend for both bar graphs
