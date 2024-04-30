@@ -9,7 +9,7 @@ def create_database(db_name):
     return cur, conn
 
 def main():
-    create_database('artist.db')
+    create_database("artist.db")
 
 if __name__ == "__main__":
     main()

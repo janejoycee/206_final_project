@@ -5,7 +5,7 @@ from grammy import retrieve_listings
 def create_grammy_billboard_table(cur, conn, start_id):
     cur.execute("""
         CREATE TABLE IF NOT EXISTS Grammy_billboard_artists (
-            billboard_artist_name TEXT,
+            billboard_artist_id INTEGER PRIMARY KEY,
             nominations_num INTEGER)
         """)
     category_dict = retrieve_listings()
@@ -26,8 +26,8 @@ def create_grammy_billboard_table(cur, conn, start_id):
         if i < len(artist_list):
             artist = artist_list[i]
             cur.execute("""INSERT OR IGNORE INTO Grammy_billboard_artists 
-                            (billboard_artist_name, nominations_num) 
-                            VALUES (?, ?)""", (artist, artist_nominations.get(artist_list[i], 0)))   
+                            (billboard_artist_id, nominations_num) 
+                            VALUES (?, ?)""", (i, artist_nominations.get(artist_list[i], 0)))   
     conn.commit()
 
     # conn.commit()
@@ -42,7 +42,7 @@ def get_start_id():
 
 
 def main():
-    conn = sqlite3.connect('artist.db')
+    conn = sqlite3.connect("artist.db")
     cur = conn.cursor()
     start_id = get_start_id()
     create_grammy_billboard_table(cur, conn, start_id)

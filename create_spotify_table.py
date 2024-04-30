@@ -25,13 +25,13 @@ def add_spotify_info(cur, conn, start_id):
     conn.commit()
 
 def create_spotify_popularity_table(cur, conn, start_id):
-    cur.execute("CREATE TABLE IF NOT EXISTS Spotify_popularity (spotify_artist_id INTEGER PRIMARY KEY, spotify_artist_name TEXT, popularity_index INTEGER)")
+    cur.execute("CREATE TABLE IF NOT EXISTS Spotify_popularity (spotify_artist_id INTEGER PRIMARY KEY, popularity_index INTEGER)")
     for i in range(start_id, start_id + 25):
         if i < len(artist_info):
             artist = list(artist_info.keys())[i]
             popularity_index = artist_info[artist]['popularity']
-            cur.execute("INSERT OR IGNORE INTO Spotify_popularity (spotify_artist_id, spotify_artist_name, popularity_index) VALUES (?, ?, ?)",
-                        (i, artist, popularity_index))
+            cur.execute("INSERT OR IGNORE INTO Spotify_popularity (spotify_artist_id, popularity_index) VALUES (?, ?)",
+                        (i,popularity_index))
     conn.commit()
 
 
@@ -45,7 +45,7 @@ def get_start_id():
 
 
 def main():
-    conn = sqlite3.connect('artist.db')
+    conn = sqlite3.connect("artist.db")
     cur = conn.cursor()
     start_id = get_start_id()
     # create_spotify_table(cur, conn, start_id)

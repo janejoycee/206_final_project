@@ -133,7 +133,7 @@ def get_start_id():
 
 
 def main(date):
-    conn = sqlite3.connect('artist.db')
+    conn = sqlite3.connect("artist.db")
     cur = conn.cursor()
     start_id = get_start_id()
     artist_list = get_artist_list(date)

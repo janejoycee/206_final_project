@@ -21,7 +21,7 @@ def get_start_id():
         return int(file.readline())
 
 def main(date):
-    conn = sqlite3.connect('artist.db')
+    conn = sqlite3.connect("artist.db")
     cur = conn.cursor()
     artist_list = get_artist_list(date)
     start_id = get_start_id()
