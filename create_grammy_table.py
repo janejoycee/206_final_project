@@ -31,7 +31,6 @@ def create_grammy_table(cur, conn, start_id, listing_data, winners_data, artist_
 
     
     
-    
     artist_info = {}
 
     for nominees in listing_data.values():
