@@ -273,7 +273,7 @@ def main(date):
             for index, nomination in enumerate(top_ten_nominations, 1):
                 artist_name = nomination[0]  #bc artist name in first column 
                 nominations_num = nomination[1]  # nominations number is in the second column
-                f.write(f"{index}. Artist: {artist_name}, Nominations: {nominations_num}\n")
+                f.write(f"{index}. Artist ID: {artist_name}, Nominations: {nominations_num}\n")
 
             top_twenty_avg = sum(nomination[1] for nomination in top_ten_nominations) / len(top_ten_nominations)
             f.write(f"\nAVG GRAMMY NOMINATION FOR TOP TEN ARTISTS: {top_twenty_avg}\n")

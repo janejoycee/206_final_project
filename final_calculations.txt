@@ -1,19 +1,19 @@
 Most Popular Artists on Spotify:
 
-AVG NUM OF FOLLOWERS = 21,172,563.56
-AVG POPULARITY INDEX = 78.18
+AVG NUM OF FOLLOWERS = 21,182,451.90
+AVG POPULARITY INDEX = 78.08
 AVG GRAMMY NOMINATIONS = 0.37
 
 Top Ten Nominations:
-1. Artist: Adele, Nominations: 6
-2. Artist: Harry Styles, Nominations: 5
-3. Artist: Kendrick Lamar, Nominations: 4
-4. Artist: Lizzo, Nominations: 4
-5. Artist: Doja Cat, Nominations: 4
-6. Artist: Bad Bunny, Nominations: 3
-7. Artist: Steve Lacy, Nominations: 3
-8. Artist: Latto, Nominations: 2
-9. Artist: Taylor Swift, Nominations: 1
-10. Artist: Luke Combs, Nominations: 1
+1. Artist ID: 38, Nominations: 6
+2. Artist ID: 14, Nominations: 5
+3. Artist ID: 15, Nominations: 4
+4. Artist ID: 77, Nominations: 4
+5. Artist ID: 82, Nominations: 4
+6. Artist ID: 13, Nominations: 3
+7. Artist ID: 65, Nominations: 3
+8. Artist ID: 91, Nominations: 2
+9. Artist ID: 0, Nominations: 1
+10. Artist ID: 3, Nominations: 1
 
 AVG GRAMMY NOMINATION FOR TOP TEN ARTISTS: 3.3
